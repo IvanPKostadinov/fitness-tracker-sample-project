@@ -29,7 +29,7 @@
     </mat-form-field>
     <!-- Datepicker: -->
     <mat-form-field>
-      <input matInput placeholder="Your birthdate" [matDatepicker]="picker"/>
+      <input matInput placeholder="Your birthdate" [matDatepicker]="picker" [max]="maxDate"/>
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
