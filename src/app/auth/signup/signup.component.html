@@ -1,5 +1,5 @@
 <section class="signup-form">
-  <form fxLayout="column" fxLayoutAlign="center center" #f="ngForm" (ngSubmit)="onSubmit(f)">
+  <form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="10px" #f="ngForm" (ngSubmit)="onSubmit(f)">
     <mat-form-field>
       <!-- email is a validator from Angular, NOT Angular Material -->
       <input
@@ -39,7 +39,7 @@
     <!-- labelPosition="before" -->
     <mat-checkbox ngModel name="agree" color="primary" required>Agree to terms and conditions.</mat-checkbox>
 
-    <button type="submit" mat-raised-button color="primary">Submit</button>
+    <button type="submit" mat-raised-button color="primary" [disabled]="f.invalid">Submit</button>
   </form>
 </section>
 
