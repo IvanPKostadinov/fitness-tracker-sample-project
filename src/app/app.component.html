@@ -1,5 +1,18 @@
+<mat-sidenav-container>
+  <!-- [opened]="openSidenav" , opened -->
+  <mat-sidenav #sidenav role="navigation">
+    <p>I'm Sidenav!</p>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <!-- <button (click)="sidenav.toggle()">Open Sidenav</button> -->
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
+
+
 <!-- <button mat-raised-button color="accent"> -->
 <!-- <button mat-icon-button color="accent">
   <mat-icon>home</mat-icon>
 </button> -->
-<router-outlet></router-outlet>
