@@ -5,8 +5,18 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <!-- <button (click)="sidenav.toggle()">Open Sidenav</button> -->
-    <router-outlet></router-outlet>
+    <mat-toolbar color="primary">
+      <div><button (click)="sidenav.toggle()">Toggle Sidenav</button></div>
+      <div>LOGO</div>
+      <div>
+        <a routerLink="/signup">Sign Up</a>
+        <a routerLink="/login">Login</a>
+        <a routerLink="/training">Training</a>
+      </div>
+    </mat-toolbar>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
   </mat-sidenav-content>
 
 </mat-sidenav-container>
