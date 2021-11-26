@@ -1,0 +1,16 @@
+a {
+  text-decoration: none;
+  color: white;
+}
+
+/* change color if we hover over a link */
+a:hover, a:active {
+  color: lightgray;
+}
+
+.navigation-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
