@@ -7,7 +7,7 @@ import { User } from './user.model';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   authChange = new Subject<boolean>();
-  private user: User;
+  private user: User | null;
 
   registerUser(authData: AuthData) {
     this.user = {
