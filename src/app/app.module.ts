@@ -16,6 +16,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { HeaderComponent } from './navigation/header/header.component';
 import { SidenavListComponent } from './navigation/sidenav-list/sidenav-list.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { StopTrainingComponent } from './training/current-training/stop-training.component';
 
 
 @NgModule({
@@ -30,6 +31,7 @@ import { WelcomeComponent } from './welcome/welcome.component';
     HeaderComponent,
     SidenavListComponent,
     WelcomeComponent,
+    StopTrainingComponent,
   ],
   imports: [
     BrowserModule,
@@ -41,6 +43,7 @@ import { WelcomeComponent } from './welcome/welcome.component';
     ReactiveFormsModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [StopTrainingComponent],
 })
 export class AppModule { }
