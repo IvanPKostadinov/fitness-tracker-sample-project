@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "ng-fitness-tracker-7f5d2": {
+      "hosting": {
+        "fitness-tracker": [
+          "ng-fitness-tracker-7f5d2"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "ng-fitness-tracker-7f5d2"
+  }
+}
