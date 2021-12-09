@@ -9,7 +9,7 @@
         <mat-form-field>
           <mat-select placeholder="Choose Exercise" ngModel name="exercise" required>
             <!-- Here we add the async pipe, because exercises is an Observable: -->
-            <mat-option *ngFor="let exercise of exercises | async" [value]="exercise.name">
+            <mat-option *ngFor="let exercise of exercises" [value]="exercise.id">
               {{ exercise.name }}
             </mat-option>
           </mat-select>

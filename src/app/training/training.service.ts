@@ -1,22 +1,43 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { AngularFirestore, DocumentChangeAction } from '@angular/fire/compat/firestore';
+import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Exercise } from './exercise.model';
 
+// to be able to inject something in a Service, we need to add @Injectable()
 @Injectable({ providedIn: 'root'})
 export class TrainingService {
   exerciseChanged = new Subject<Exercise>();
-  private availableExercises: Exercise[] = [
-    { id: 'crunches', name: 'Crunches', duration: 30, calories: 8 },
-    { id: 'touch-toes', name: 'Touch Toes', duration: 180, calories: 15 },
-    { id: 'side-lunges', name: 'Side Lunges', duration: 120, calories: 18 },
-    { id: 'burpees', name: 'Burpees', duration: 60, calories: 8 },
-  ];
+  exercisesChanged = new Subject<Exercise[]>();
+  private availableExercises: Exercise[] = [];
   private runningExercise: Exercise;
   private exercises: Exercise[] = [];
 
-  getAvailableExercises() {
-    return this.availableExercises.slice();
+  constructor(private db: AngularFirestore) {}
+
+  fetchAvailableExercises() {
+    // Here we use Angularfire to reach out to Firebase:
+    // this.exercises = this.db.collection('availableExercises').valueChanges();
+    return this.db
+      .collection('availableExercises')
+      // .snapshotChanges() returns an Observable!
+      .snapshotChanges()
+      .pipe(
+        map((docArray: DocumentChangeAction<any>[]) => {
+          return docArray.map(doc => {
+            return {
+              id: doc.payload.doc.id,
+              // With res.payload.doc.data() -> we can extract the data from Firebase!!!
+              ...doc.payload.doc.data(),
+            }
+          })
+        })
+      )
+      .subscribe((exercises: Exercise[]) => {
+        this.availableExercises = exercises;
+        this.exercisesChanged.next([...this.availableExercises]);
+      });
   }
 
   startExercise(selectedId: string) {
