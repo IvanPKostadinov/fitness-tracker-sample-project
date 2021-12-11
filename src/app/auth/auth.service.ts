@@ -5,6 +5,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 import { AuthData } from './auth-data.model';
 import { User } from './user.model';
+import { TrainingService } from '../training/training.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -12,7 +13,11 @@ export class AuthService {
   // private user: User | null;
   private isAuthenticated = false;
 
-  constructor(private router: Router, private afAuth: AngularFireAuth) {}
+  constructor(
+    private router: Router,
+    private afAuth: AngularFireAuth,
+    private trainingService: TrainingService
+  ) {}
 
   registerUser(authData: AuthData) {
     // this.user = {
@@ -38,6 +43,8 @@ export class AuthService {
     //   userId: Math.round(Math.random() * 1000).toString(),
     // };
 
+    // Angular Firestore stores a token and sends it with every request.
+    // It does this for us, we don't have to do it:
     this.afAuth
       .signInWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
@@ -51,6 +58,11 @@ export class AuthService {
 
   logout() {
     // this.user = null;
+
+    // We should .unsubscribe on logout because otherwise we have an
+    // ongoing subscription and get an error:
+    this.trainingService.cancelSubscriptions();
+    this.afAuth.signOut();
     this.authChange.next(false);
     this.router.navigate(['/login']);
     this.isAuthenticated = false;

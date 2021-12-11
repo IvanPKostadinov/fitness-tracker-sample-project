@@ -5,6 +5,7 @@ import {
 } from '@angular/fire/compat/firestore';
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { Exercise } from './exercise.model';
 
@@ -17,6 +18,7 @@ export class TrainingService {
   private availableExercises: Exercise[] = [];
   private runningExercise: Exercise;
   // private finishedExercises: Exercise[] = [];
+  private subscriptions: Subscription[] = [];
 
   constructor(private db: AngularFirestore) {}
 
@@ -24,7 +26,7 @@ export class TrainingService {
     // Here we use Angularfire to reach out to Firebase:
     // this.exercises = this.db.collection('availableExercises').valueChanges();
     return (
-      this.db
+      this.subscriptions.push(this.db
         .collection('availableExercises')
         // .snapshotChanges() returns an Observable!
         .snapshotChanges()
@@ -43,7 +45,7 @@ export class TrainingService {
           this.availableExercises = exercises;
           this.exercisesChanged.next([...this.availableExercises]);
         })
-    );
+    ));
   }
 
   startExercise(selectedId: string) {
@@ -85,12 +87,16 @@ export class TrainingService {
 
   fetchCompletedOrCancelledExercises() {
     // valueChanges gives us an array of elements WITHOUT id:
-    this.db
+    this.subscriptions.push(this.db
       .collection('finishedExercises')
       .valueChanges()
       .subscribe((exercises: Exercise[]) => {
         this.finishedExercisesChanged.next(exercises);
-      });
+      }));
+  }
+
+  cancelSubscriptions() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   private addDataToDatabase(exercise: Exercise) {
