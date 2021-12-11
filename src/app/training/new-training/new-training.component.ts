@@ -28,8 +28,8 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
     // It's good practice to initialize some services in the ngOnInit():
     // this.exercises = this.trainingService.getAvailableExercises();
 
-    this.exerciseSubscription = this.trainingService.fetchAvailableExercises();
-    this.trainingService.exercisesChanged.subscribe(exercises => this.exercises = exercises);
+    this.trainingService.fetchAvailableExercises();
+    this.exerciseSubscription = this.trainingService.exercisesChanged.subscribe(exercises => this.exercises = exercises);
   }
 
   ngOnDestroy() {

@@ -25,8 +25,8 @@ export class TrainingService {
   fetchAvailableExercises() {
     // Here we use Angularfire to reach out to Firebase:
     // this.exercises = this.db.collection('availableExercises').valueChanges();
-    return (
-      this.subscriptions.push(this.db
+    this.subscriptions.push(
+      this.db
         .collection('availableExercises')
         // .snapshotChanges() returns an Observable!
         .snapshotChanges()
@@ -45,7 +45,7 @@ export class TrainingService {
           this.availableExercises = exercises;
           this.exercisesChanged.next([...this.availableExercises]);
         })
-    ));
+    );
   }
 
   startExercise(selectedId: string) {
@@ -87,16 +87,18 @@ export class TrainingService {
 
   fetchCompletedOrCancelledExercises() {
     // valueChanges gives us an array of elements WITHOUT id:
-    this.subscriptions.push(this.db
-      .collection('finishedExercises')
-      .valueChanges()
-      .subscribe((exercises: Exercise[]) => {
-        this.finishedExercisesChanged.next(exercises);
-      }));
+    this.subscriptions.push(
+      this.db
+        .collection('finishedExercises')
+        .valueChanges()
+        .subscribe((exercises: Exercise[]) => {
+          this.finishedExercisesChanged.next(exercises);
+        })
+    );
   }
 
   cancelSubscriptions() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   private addDataToDatabase(exercise: Exercise) {
