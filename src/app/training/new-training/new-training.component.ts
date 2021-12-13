@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
+import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction } from '@angular/fire/compat/firestore';
+import { Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Exercise } from '../exercise.model';
 import { TrainingService } from '../training.service';
@@ -11,26 +12,28 @@ import { TrainingService } from '../training.service';
   templateUrl: './new-training.component.html',
   styleUrls: ['./new-training.component.css'],
 })
-export class NewTrainingComponent implements OnInit {
+export class NewTrainingComponent implements OnInit, OnDestroy {
   // @Output() trainingStart = new EventEmitter<void>();
   // exercises: Exercise[] = [];
   // We put <any> here because Exercise has an id property:
-  exercises: Observable<any>;
+  exercises: Exercise[];
+  exerciseSubscription: Subscription;
 
   constructor(
     private trainingService: TrainingService,
-    private db: AngularFirestore
+    // private db: AngularFirestore
   ) {}
 
   ngOnInit(): void {
     // It's good practice to initialize some services in the ngOnInit():
     // this.exercises = this.trainingService.getAvailableExercises();
 
-    // Here we use Angularfire to reach out to Firebase:
-    this.exercises = this.db.collection('availableExercises').valueChanges();
-    // .subscribe((result) => {
-    //   console.log(result)
-    // });
+    this.trainingService.fetchAvailableExercises();
+    this.exerciseSubscription = this.trainingService.exercisesChanged.subscribe(exercises => this.exercises = exercises);
+  }
+
+  ngOnDestroy() {
+    this.exerciseSubscription.unsubscribe();
   }
 
   onStartTraining(form: NgForm) {

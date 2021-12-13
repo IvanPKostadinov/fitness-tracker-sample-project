@@ -1,33 +1,66 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import {
+  AngularFirestore,
+  DocumentChangeAction,
+} from '@angular/fire/compat/firestore';
+import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { Exercise } from './exercise.model';
 
-@Injectable({ providedIn: 'root'})
+// to be able to inject something in a Service, we need to add @Injectable()
+@Injectable({ providedIn: 'root' })
 export class TrainingService {
   exerciseChanged = new Subject<Exercise>();
-  private availableExercises: Exercise[] = [
-    { id: 'crunches', name: 'Crunches', duration: 30, calories: 8 },
-    { id: 'touch-toes', name: 'Touch Toes', duration: 180, calories: 15 },
-    { id: 'side-lunges', name: 'Side Lunges', duration: 120, calories: 18 },
-    { id: 'burpees', name: 'Burpees', duration: 60, calories: 8 },
-  ];
+  exercisesChanged = new Subject<Exercise[]>();
+  finishedExercisesChanged = new Subject<Exercise[]>();
+  private availableExercises: Exercise[] = [];
   private runningExercise: Exercise;
-  private exercises: Exercise[] = [];
+  // private finishedExercises: Exercise[] = [];
+  private subscriptions: Subscription[] = [];
 
-  getAvailableExercises() {
-    return this.availableExercises.slice();
+  constructor(private db: AngularFirestore) {}
+
+  fetchAvailableExercises() {
+    // Here we use Angularfire to reach out to Firebase:
+    // this.exercises = this.db.collection('availableExercises').valueChanges();
+    this.subscriptions.push(
+      this.db
+        .collection('availableExercises')
+        // .snapshotChanges() returns an Observable!
+        .snapshotChanges()
+        .pipe(
+          map((docArray: DocumentChangeAction<any>[]) => {
+            return docArray.map((doc) => {
+              return {
+                id: doc.payload.doc.id,
+                // With res.payload.doc.data() -> we can extract the data from Firebase!!!
+                ...doc.payload.doc.data(),
+              };
+            });
+          })
+        )
+        .subscribe((exercises: Exercise[]) => {
+          this.availableExercises = exercises;
+          this.exercisesChanged.next([...this.availableExercises]);
+        })
+    );
   }
 
   startExercise(selectedId: string) {
-    this.runningExercise = this.availableExercises.find(ex => ex.id === selectedId);
+    // // Here we are selecting a single document and updating it with .update():
+    // this.db.doc('availableExercises/' + selectedId).update({lastSelected: new Date()});
+    this.runningExercise = this.availableExercises.find(
+      (ex) => ex.id === selectedId
+    );
     // We pass (with next()) the selected exercise through a Subject and subscribe to it, where we need it:
     // here we pass a copy of the runningExercise:
-    this.exerciseChanged.next({...this.runningExercise});
+    this.exerciseChanged.next({ ...this.runningExercise });
   }
 
   completeExercise() {
-    this.exercises.push({
+    this.addDataToDatabase({
       ...this.runningExercise,
       date: new Date(),
       state: 'completed',
@@ -37,7 +70,7 @@ export class TrainingService {
   }
 
   cancelExercise(progress: number) {
-    this.exercises.push({
+    this.addDataToDatabase({
       ...this.runningExercise,
       duration: this.runningExercise.duration * (progress / 100),
       calories: this.runningExercise.calories * (progress / 100),
@@ -52,7 +85,26 @@ export class TrainingService {
     return { ...this.runningExercise };
   }
 
-  getCompletedOrCancelledExercises() {
-    return this.exercises.slice();
+  fetchCompletedOrCancelledExercises() {
+    // valueChanges gives us an array of elements WITHOUT id:
+    this.subscriptions.push(
+      this.db
+        .collection('finishedExercises')
+        .valueChanges()
+        .subscribe((exercises: Exercise[]) => {
+          this.finishedExercisesChanged.next(exercises);
+        })
+    );
+  }
+
+  cancelSubscriptions() {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
+  private addDataToDatabase(exercise: Exercise) {
+    // Here we reach out to a Collection, that doesn't exist
+    // -> it will be created automatically
+    // .add() returns a Promise!
+    this.db.collection('finishedExercises').add(exercise);
   }
 }
