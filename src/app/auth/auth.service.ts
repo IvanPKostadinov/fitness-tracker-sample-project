@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthData } from './auth-data.model';
 import { User } from './user.model';
 import { TrainingService } from '../training/training.service';
+import { UIService } from '../shared/ui.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     private afAuth: AngularFireAuth,
     private trainingService: TrainingService,
     private snackbar: MatSnackBar,
+    private uiService: UIService,
   ) {}
 
   initAuthListener() {
@@ -44,11 +46,14 @@ export class AuthService {
     //   userId: Math.round(Math.random() * 1000).toString(),
     // };
 
+    this.uiService.loadingStateChanged.next(true);
+
     // We should turn on Authentication in Firebase for this to work!
     this.afAuth
       .createUserWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
         // this.authSuccessfully();
+        this.uiService.loadingStateChanged.next(false);
       })
       .catch((error) => {
         // The error object has property message, that we can access:
@@ -66,14 +71,19 @@ export class AuthService {
     //   userId: Math.round(Math.random() * 1000).toString(),
     // };
 
+    this.uiService.loadingStateChanged.next(true);
+
     // Angular Firestore stores a token and sends it with every request.
     // It does this for us, we don't have to do it:
     this.afAuth
       .signInWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
         // this.authSuccessfully();
+        this.uiService.loadingStateChanged.next(false);
       })
       .catch((error) => {
+        this.uiService.loadingStateChanged.next(false);
+
         // The error object has property message, that we can access:
         // duration: 3000 -> will be closed after 3 seconds
         // 'Close' is button with action, to which we can react -> see material.angular.io docs
