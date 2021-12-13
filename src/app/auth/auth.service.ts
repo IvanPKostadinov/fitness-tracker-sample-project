@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthData } from './auth-data.model';
 import { User } from './user.model';
@@ -16,7 +17,8 @@ export class AuthService {
   constructor(
     private router: Router,
     private afAuth: AngularFireAuth,
-    private trainingService: TrainingService
+    private trainingService: TrainingService,
+    private snackbar: MatSnackBar,
   ) {}
 
   initAuthListener() {
@@ -49,7 +51,12 @@ export class AuthService {
         // this.authSuccessfully();
       })
       .catch((error) => {
-        console.log(error);
+        // The error object has property message, that we can access:
+        // duration: 3000 -> will be closed after 3 seconds
+        // 'Close' is button with action, to which we can react -> see material.angular.io docs
+        this.snackbar.open(error.message, 'Close', {
+          duration: 3000,
+        });
       });
   }
 
@@ -67,7 +74,12 @@ export class AuthService {
         // this.authSuccessfully();
       })
       .catch((error) => {
-        console.log(error);
+        // The error object has property message, that we can access:
+        // duration: 3000 -> will be closed after 3 seconds
+        // 'Close' is button with action, to which we can react -> see material.angular.io docs
+        this.snackbar.open(error.message, 'Close', {
+          duration: 3000,
+        });
       });
   }
 
