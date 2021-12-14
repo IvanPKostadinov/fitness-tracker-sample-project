@@ -25,9 +25,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(subscription => {
+    if(this.subscriptions.length > 0) {
+      this.subscriptions.forEach(subscription => {
       subscription.unsubscribe();
-    })
+      })
+    }
   }
 
   onToggleSidenav() {

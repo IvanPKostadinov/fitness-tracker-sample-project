@@ -110,7 +110,9 @@ export class TrainingService {
   }
 
   cancelSubscriptions() {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    if(this.subscriptions.length > 0) {
+      this.subscriptions.forEach((sub) => sub.unsubscribe());
+    }
   }
 
   private addDataToDatabase(exercise: Exercise) {

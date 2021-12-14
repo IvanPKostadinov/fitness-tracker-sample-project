@@ -46,9 +46,11 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(sub => {
-      sub.unsubscribe();
-    })
+    if(this.subscriptions.length > 0) {
+      this.subscriptions.forEach(sub => {
+        sub.unsubscribe();
+      })
+    }
   }
 
   fetchExercises() {
