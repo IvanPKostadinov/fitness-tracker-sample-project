@@ -8,7 +8,6 @@ import { provideDatabase,getDatabase } from '@angular/fire/database';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { provideAnalytics,getAnalytics,ScreenTrackingService,UserTrackingService } from '@angular/fire/analytics';
 import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 
 import { AppComponent } from './app.component';
 import { MaterialModule } from './material.module';
@@ -16,7 +15,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { HeaderComponent } from './navigation/header/header.component';
 import { SidenavListComponent } from './navigation/sidenav-list/sidenav-list.component';
 import { WelcomeComponent } from './welcome/welcome.component';
-import { StopTrainingComponent } from './training/current-training/stop-training.component';
 import { environment } from '../environments/environment';
 import { AuthModule } from './auth/auth.module';
 import { TrainingModule } from './training/training.module';
@@ -40,7 +38,7 @@ import { TrainingModule } from './training/training.module';
     TrainingModule,
     AngularFireModule.initializeApp(environment.firebase),
     // AngularFirestoreModule,
-    AngularFireAuthModule,
+    // AngularFireAuthModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     provideDatabase(() => getDatabase()),
