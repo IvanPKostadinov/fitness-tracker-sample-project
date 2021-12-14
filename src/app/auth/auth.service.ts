@@ -19,7 +19,6 @@ export class AuthService {
     private router: Router,
     private afAuth: AngularFireAuth,
     private trainingService: TrainingService,
-    private snackbar: MatSnackBar,
     private uiService: UIService,
   ) {}
 
@@ -48,7 +47,7 @@ export class AuthService {
 
     this.uiService.loadingStateChanged.next(true);
 
-    // We should turn on Authentication in Firebase for this to work!
+    /** We should turn on Authentication in Firebase for this to work! */
     this.afAuth
       .createUserWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
@@ -56,12 +55,16 @@ export class AuthService {
         this.uiService.loadingStateChanged.next(false);
       })
       .catch((error) => {
-        // The error object has property message, that we can access:
-        // duration: 3000 -> will be closed after 3 seconds
-        // 'Close' is button with action, to which we can react -> see material.angular.io docs
-        this.snackbar.open(error.message, 'Close', {
-          duration: 3000,
-        });
+        this.uiService.showSnackbar(error.message, 'Close', 3000);
+
+        /**
+         * The error object has property message, that we can access:
+         * duration: 3000 -> will be closed after 3 seconds
+         * 'Close' is button with action, to which we can react -> see material.angular.io docs
+         */
+        // this.snackbar.open(error.message, 'Close', {
+        //   duration: 3000,
+        // });
       });
   }
 
@@ -73,8 +76,10 @@ export class AuthService {
 
     this.uiService.loadingStateChanged.next(true);
 
-    // Angular Firestore stores a token and sends it with every request.
-    // It does this for us, we don't have to do it:
+    /**
+     * Angular Firestore stores a token and sends it with every request.
+     * It does this for us, we don't have to do it:
+     */
     this.afAuth
       .signInWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
@@ -83,21 +88,26 @@ export class AuthService {
       })
       .catch((error) => {
         this.uiService.loadingStateChanged.next(false);
+        this.uiService.showSnackbar(error.message, 'Close', 3000);
 
-        // The error object has property message, that we can access:
-        // duration: 3000 -> will be closed after 3 seconds
-        // 'Close' is button with action, to which we can react -> see material.angular.io docs
-        this.snackbar.open(error.message, 'Close', {
-          duration: 3000,
-        });
+        /**
+         * The error object has property message, that we can access:
+         * duration: 3000 -> will be closed after 3 seconds
+         * 'Close' is button with action, to which we can react -> see material.angular.io docs
+         */
+        // this.snackbar.open(error.message, 'Close', {
+        //   duration: 3000,
+        // });
       });
   }
 
   logout() {
     // this.user = null;
 
-    // We should .unsubscribe on logout because otherwise we have an
-    // ongoing subscription and get an error:
+    /**
+     * We should .unsubscribe on logout because otherwise we have an
+     * ongoing subscription and get an error:
+     */
     this.afAuth.signOut();
     // this.trainingService.cancelSubscriptions();
     // this.authChange.next(false);
@@ -105,9 +115,10 @@ export class AuthService {
     // this.isAuthenticated = false;
   }
 
+  /**
+   * !!! Here we use the spread operator to return a copy of the user !!!
+   */
   // getUser() {
-  //   // !!!
-  //   // !!! Here we use the spread operator to return a copy of the user !!!
   //   return { ...this.user };
   // }
 
