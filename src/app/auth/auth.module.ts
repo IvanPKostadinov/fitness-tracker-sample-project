@@ -1,13 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
-import { MaterialModule } from '../material.module';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { SharedModule } from '../shared/shared.module';
+import { AuthRoutingModule } from './auth-routing.module';
 
 @NgModule({
   declarations: [
@@ -18,6 +16,7 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule,
     ReactiveFormsModule,
     AngularFireAuthModule,
+    AuthRoutingModule,
     // CommonModule,
     // FormsModule,
     // MaterialModule,
