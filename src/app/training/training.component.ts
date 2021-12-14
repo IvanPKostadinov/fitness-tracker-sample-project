@@ -10,7 +10,7 @@ import { TrainingService } from './training.service';
 })
 export class TrainingComponent implements OnInit, OnDestroy {
   ongoingTraining = false;
-  subscriptions: Subscription[];
+  subscriptions: Subscription[] = [];
 
   constructor(private trainingService: TrainingService) { }
 

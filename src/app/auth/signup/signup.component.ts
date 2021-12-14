@@ -13,7 +13,7 @@ import { AuthService } from '../auth.service';
 export class SignupComponent implements OnInit, OnDestroy {
   maxDate: Date;
   isLoading = false;
-  private subscriptions: Subscription[];
+  private subscriptions: Subscription[] = [];
 
   constructor(private authService: AuthService, private uiService: UIService) { }
 

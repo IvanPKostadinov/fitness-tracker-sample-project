@@ -17,7 +17,7 @@ export class PastTrainingsComponent implements OnInit, OnDestroy, AfterViewInit 
   // Here we define Exercise, but MatTableDataSource always expects an
   // array of the type, that we've passed -> here Execise[]:
   dataSource = new MatTableDataSource<Exercise>();
-  private subscriptions: Subscription[];
+  private subscriptions: Subscription[] = [];
 
   // Here we wire-up the sorting and filtering:
   @ViewChild(MatSort) sort: MatSort;

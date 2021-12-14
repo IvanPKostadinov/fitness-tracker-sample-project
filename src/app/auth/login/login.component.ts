@@ -13,7 +13,7 @@ import { UIService } from 'src/app/shared/ui.service';
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   isLoading = false;
-  private subscriptions: Subscription[];
+  private subscriptions: Subscription[] = [];
   private loadingSubs: Subscription;
 
   constructor(private authService: AuthService, private uiService: UIService) {}
