@@ -11,19 +11,23 @@ import { AuthService } from 'src/app/auth/auth.service';
 export class HeaderComponent implements OnInit, OnDestroy {
   @Output() sidenavToggle = new EventEmitter<void>();
   isAuth = false;
-  subscriptions: Subscription;
+  subscriptions: Subscription[];
 
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
     // It's good practice to initialize some services in the ngOnInit():
-    this.subscriptions = this.authService.authChange.subscribe(authStatus => {
+    const sub = this.authService.authChange.subscribe(authStatus => {
       this.isAuth = authStatus;
     })
+
+    this.subscriptions.push(sub)
   }
 
   ngOnDestroy() {
-    this.subscriptions.unsubscribe();
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    })
   }
 
   onToggleSidenav() {

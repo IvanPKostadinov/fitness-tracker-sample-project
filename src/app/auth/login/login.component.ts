@@ -13,12 +13,13 @@ import { UIService } from 'src/app/shared/ui.service';
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   isLoading = false;
+  private subscriptions: Subscription[];
   private loadingSubs: Subscription;
 
   constructor(private authService: AuthService, private uiService: UIService) {}
 
   ngOnInit(): void {
-    this.loadingSubs = this.uiService.loadingStateChanged.subscribe(isLoading => {
+    const loadingSub = this.uiService.loadingStateChanged.subscribe(isLoading => {
       this.isLoading = isLoading;
     });
     this.loginForm = new FormGroup({
@@ -29,10 +30,14 @@ export class LoginComponent implements OnInit, OnDestroy {
         validators: [Validators.required],
       }),
     });
+
+    this.subscriptions.push(loadingSub);
   }
 
   ngOnDestroy(): void {
-    this.loadingSubs.unsubscribe();
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    });
   }
 
   onSubmit() {

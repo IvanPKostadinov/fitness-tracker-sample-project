@@ -17,7 +17,7 @@ export class PastTrainingsComponent implements OnInit, OnDestroy, AfterViewInit 
   // Here we define Exercise, but MatTableDataSource always expects an
   // array of the type, that we've passed -> here Execise[]:
   dataSource = new MatTableDataSource<Exercise>();
-  private subscription: Subscription;
+  private subscriptions: Subscription[];
 
   // Here we wire-up the sorting and filtering:
   @ViewChild(MatSort) sort: MatSort;
@@ -31,9 +31,11 @@ export class PastTrainingsComponent implements OnInit, OnDestroy, AfterViewInit 
     // this.dataSource.data = this.trainingService.getCompletedOrCancelledExercises();
 
     this.trainingService.fetchCompletedOrCancelledExercises();
-    this.subscription = this.trainingService.finishedExercisesChanged.subscribe((exercises: Exercise []) => {
+    const exerciseSub = this.trainingService.finishedExercisesChanged.subscribe((exercises: Exercise []) => {
       this.dataSource.data = exercises;
     });
+
+    this.subscriptions.push(exerciseSub);
   }
 
   ngAfterViewInit() {
@@ -43,7 +45,9 @@ export class PastTrainingsComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    })
   }
 
   doFilter(event: any) {

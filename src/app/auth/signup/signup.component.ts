@@ -13,20 +13,24 @@ import { AuthService } from '../auth.service';
 export class SignupComponent implements OnInit, OnDestroy {
   maxDate: Date;
   isLoading = false;
-  private subscription: Subscription;
+  private subscriptions: Subscription[];
 
   constructor(private authService: AuthService, private uiService: UIService) { }
 
   ngOnInit(): void {
-    this.subscription = this.uiService.loadingStateChanged.subscribe(isLoading => {
+    const loadingSub = this.uiService.loadingStateChanged.subscribe(isLoading => {
       this.isLoading = isLoading;
     })
     this.maxDate = new Date();
     this.maxDate.setFullYear(this.maxDate.getFullYear() - 18);
+
+    this.subscriptions.push(loadingSub);
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    })
   }
 
   onSubmit(form: NgForm) {

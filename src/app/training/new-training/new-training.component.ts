@@ -18,7 +18,7 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   // exercises: Exercise[] = [];
   // We put <any> here because Exercise has an id property:
   exercises: Exercise[];
-  private subscriptions: Subscription[] = [];
+  private subscriptions: Subscription[];
   isLoading = true;
 
   constructor(
