@@ -31,12 +31,16 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
     // It's good practice to initialize some services in the ngOnInit():
     // this.exercises = this.trainingService.getAvailableExercises();
 
-    this.trainingService.fetchAvailableExercises();
 
-    const exerciseSub = this.trainingService.exercisesChanged.subscribe(exercises => this.exercises = exercises);
+    const exerciseSub = this.trainingService.exercisesChanged.subscribe(exercises => {
+      /** Here we get null if an error is thrown in the service */
+      this.exercises = exercises;
+    });
     const loadingSub = this.uiService.loadingStateChanged.subscribe(isLoading => {
       this.isLoading = isLoading;
     });
+
+    this.fetchExercises();
 
     this.subscriptions.push(exerciseSub, loadingSub);
   }
@@ -45,6 +49,10 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => {
       sub.unsubscribe();
     })
+  }
+
+  fetchExercises() {
+    this.trainingService.fetchAvailableExercises();
   }
 
   onStartTraining(form: NgForm) {
