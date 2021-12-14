@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { Exercise } from './exercise.model';
+import { UIService } from '../shared/ui.service';
 
 // to be able to inject something in a Service, we need to add @Injectable()
 @Injectable({ providedIn: 'root' })
@@ -20,9 +21,11 @@ export class TrainingService {
   // private finishedExercises: Exercise[] = [];
   private subscriptions: Subscription[] = [];
 
-  constructor(private db: AngularFirestore) {}
+  constructor(private db: AngularFirestore, private uiService: UIService) {}
 
   fetchAvailableExercises() {
+    this.uiService.loadingStateChanged.next(true);
+
     // Here we use Angularfire to reach out to Firebase:
     // this.exercises = this.db.collection('availableExercises').valueChanges();
     this.subscriptions.push(
@@ -32,6 +35,7 @@ export class TrainingService {
         .snapshotChanges()
         .pipe(
           map((docArray: DocumentChangeAction<any>[]) => {
+            // throw(new Error());
             return docArray.map((doc) => {
               return {
                 id: doc.payload.doc.id,
@@ -42,8 +46,16 @@ export class TrainingService {
           })
         )
         .subscribe((exercises: Exercise[]) => {
+          this.uiService.loadingStateChanged.next(false);
           this.availableExercises = exercises;
           this.exercisesChanged.next([...this.availableExercises]);
+        }, error => {
+          this.uiService.loadingStateChanged.next(false);
+          this.uiService.showSnackbar('Fetching Exercises failed, please try again!', 'Close', 3000);
+          /**
+           * With passing null, we can show a button in new-training.component to try and fetch the exercises again.
+           */
+          this.exerciseChanged.next(null);
         })
     );
   }
@@ -98,7 +110,9 @@ export class TrainingService {
   }
 
   cancelSubscriptions() {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    if(this.subscriptions.length > 0) {
+      this.subscriptions.forEach((sub) => sub.unsubscribe());
+    }
   }
 
   private addDataToDatabase(exercise: Exercise) {
