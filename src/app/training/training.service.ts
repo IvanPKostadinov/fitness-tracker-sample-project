@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { Exercise } from './exercise.model';
+import { UIService } from '../shared/ui.service';
 
 // to be able to inject something in a Service, we need to add @Injectable()
 @Injectable({ providedIn: 'root' })
@@ -20,9 +21,11 @@ export class TrainingService {
   // private finishedExercises: Exercise[] = [];
   private subscriptions: Subscription[] = [];
 
-  constructor(private db: AngularFirestore) {}
+  constructor(private db: AngularFirestore, private uiService: UIService) {}
 
   fetchAvailableExercises() {
+    this.uiService.loadingStateChanged.next(true);
+
     // Here we use Angularfire to reach out to Firebase:
     // this.exercises = this.db.collection('availableExercises').valueChanges();
     this.subscriptions.push(
@@ -42,6 +45,7 @@ export class TrainingService {
           })
         )
         .subscribe((exercises: Exercise[]) => {
+          this.uiService.loadingStateChanged.next(false);
           this.availableExercises = exercises;
           this.exercisesChanged.next([...this.availableExercises]);
         })

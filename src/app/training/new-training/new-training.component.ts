@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 
 import { Exercise } from '../exercise.model';
 import { TrainingService } from '../training.service';
+import { UIService } from 'src/app/shared/ui.service';
 
 @Component({
   selector: 'app-new-training',
@@ -17,10 +18,12 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   // exercises: Exercise[] = [];
   // We put <any> here because Exercise has an id property:
   exercises: Exercise[];
-  exerciseSubscription: Subscription;
+  private subscriptions: Subscription[] = [];
+  isLoading = true;
 
   constructor(
     private trainingService: TrainingService,
+    private uiService: UIService,
     // private db: AngularFirestore
   ) {}
 
@@ -29,11 +32,19 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
     // this.exercises = this.trainingService.getAvailableExercises();
 
     this.trainingService.fetchAvailableExercises();
-    this.exerciseSubscription = this.trainingService.exercisesChanged.subscribe(exercises => this.exercises = exercises);
+
+    const exerciseSub = this.trainingService.exercisesChanged.subscribe(exercises => this.exercises = exercises);
+    const loadingSub = this.uiService.loadingStateChanged.subscribe(isLoading => {
+      this.isLoading = isLoading;
+    });
+
+    this.subscriptions.push(exerciseSub, loadingSub);
   }
 
   ngOnDestroy() {
-    this.exerciseSubscription.unsubscribe();
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    })
   }
 
   onStartTraining(form: NgForm) {
