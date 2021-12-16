@@ -8,6 +8,7 @@ import { provideDatabase,getDatabase } from '@angular/fire/database';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { provideAnalytics,getAnalytics,ScreenTrackingService,UserTrackingService } from '@angular/fire/analytics';
 import { AngularFireModule } from '@angular/fire/compat';
+import { StoreModule } from '@ngrx/store';
 
 import { AppComponent } from './app.component';
 import { MaterialModule } from './material.module';
@@ -17,7 +18,7 @@ import { SidenavListComponent } from './navigation/sidenav-list/sidenav-list.com
 import { WelcomeComponent } from './welcome/welcome.component';
 import { environment } from '../environments/environment';
 import { AuthModule } from './auth/auth.module';
-import { TrainingModule } from './training/training.module';
+import { appReducer } from './app.reducer';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,11 @@ import { TrainingModule } from './training/training.module';
     FlexLayoutModule,
     AuthModule,
     AngularFireModule.initializeApp(environment.firebase),
+    /**
+     * We may have multiple appReducers, responsible for multiple State slices
+     * This appReducer is responsible for UI, that's why ui: ...
+     */
+    StoreModule.forRoot({ui: appReducer}),
     /** We remove TrainingModule to implement lazy loading here */
     // TrainingModule,
     // FormsModule,
