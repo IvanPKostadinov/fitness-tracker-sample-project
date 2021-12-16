@@ -18,7 +18,7 @@ import { SidenavListComponent } from './navigation/sidenav-list/sidenav-list.com
 import { WelcomeComponent } from './welcome/welcome.component';
 import { environment } from '../environments/environment';
 import { AuthModule } from './auth/auth.module';
-import { appReducer } from './app.reducer';
+import { reducers } from './app.reducer';
 
 @NgModule({
   declarations: [
@@ -39,7 +39,7 @@ import { appReducer } from './app.reducer';
      * We may have multiple appReducers, responsible for multiple State slices
      * This appReducer is responsible for UI, that's why ui: ...
      */
-    StoreModule.forRoot({ui: appReducer}),
+    StoreModule.forRoot(reducers),
     /** We remove TrainingModule to implement lazy loading here */
     // TrainingModule,
     // FormsModule,

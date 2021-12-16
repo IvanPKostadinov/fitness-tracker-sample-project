@@ -7,7 +7,10 @@ import { Store } from '@ngrx/store';
 import { AuthData } from './auth-data.model';
 import { TrainingService } from '../training/training.service';
 import { UIService } from '../shared/ui.service';
-import * as fromApp from '../app.reducer';
+/** This is the convention - fromRoot */
+import * as fromRoot from '../app.reducer';
+/** This is the convention - UI -> just the name for Actions */
+import * as UI from '../shared/ui.actions';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -20,7 +23,7 @@ export class AuthService {
     private afAuth: AngularFireAuth,
     private trainingService: TrainingService,
     private uiService: UIService,
-    private store: Store<{ui: fromApp.State}>,
+    private store: Store<fromRoot.State>,
   ) {}
 
   initAuthListener() {
@@ -42,18 +45,18 @@ export class AuthService {
 
   registerUser(authData: AuthData) {
     // this.uiService.loadingStateChanged.next(true);
-    this.store.dispatch({ type: 'START_LOADING' });
+    this.store.dispatch(new UI.StartLoading());
 
     /** We should turn on Authentication in Firebase for this to work! */
     this.afAuth
       .createUserWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
         // this.uiService.loadingStateChanged.next(false);
-        this.store.dispatch({ type: 'STOP_LOADING' });
+        this.store.dispatch(new UI.StopLoading());
       })
       .catch((error) => {
         // this.uiService.loadingStateChanged.next(false);
-        this.store.dispatch({ type: 'STOP_LOADING' });
+        this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackbar(error.message, 'Close', 3000);
 
         /**
@@ -69,7 +72,7 @@ export class AuthService {
 
   login(authData: AuthData) {
     // this.uiService.loadingStateChanged.next(true);
-    this.store.dispatch({ type: 'START_LOADING' });
+    this.store.dispatch(new UI.StartLoading());
 
     /**
      * Angular Firestore stores a token and sends it with every request.
@@ -80,11 +83,11 @@ export class AuthService {
       .then((result) => {
         // this.authSuccessfully();
         // this.uiService.loadingStateChanged.next(false);
-        this.store.dispatch({ type: 'STOP_LOADING' });
+        this.store.dispatch(new UI.StopLoading());
       })
       .catch((error) => {
         // this.uiService.loadingStateChanged.next(false);
-        this.store.dispatch({ type: 'STOP_LOADING' });
+        this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackbar(error.message, 'Close', 3000);
 
         /**
