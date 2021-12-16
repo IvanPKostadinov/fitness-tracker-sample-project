@@ -2,12 +2,15 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Store } from '@ngrx/store';
 
 import { AuthData } from './auth-data.model';
-import { User } from './user.model';
 import { TrainingService } from '../training/training.service';
 import { UIService } from '../shared/ui.service';
+/** This is the convention - fromRoot */
+import * as fromRoot from '../app.reducer';
+/** This is the convention - UI -> just the name for Actions */
+import * as UI from '../shared/ui.actions';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -20,6 +23,7 @@ export class AuthService {
     private afAuth: AngularFireAuth,
     private trainingService: TrainingService,
     private uiService: UIService,
+    private store: Store<fromRoot.State>,
   ) {}
 
   initAuthListener() {
@@ -40,21 +44,19 @@ export class AuthService {
   }
 
   registerUser(authData: AuthData) {
-    // this.user = {
-    //   email: authData.email,
-    //   userId: Math.round(Math.random() * 1000).toString(),
-    // };
-
-    this.uiService.loadingStateChanged.next(true);
+    // this.uiService.loadingStateChanged.next(true);
+    this.store.dispatch(new UI.StartLoading());
 
     /** We should turn on Authentication in Firebase for this to work! */
     this.afAuth
       .createUserWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
-        // this.authSuccessfully();
-        this.uiService.loadingStateChanged.next(false);
+        // this.uiService.loadingStateChanged.next(false);
+        this.store.dispatch(new UI.StopLoading());
       })
       .catch((error) => {
+        // this.uiService.loadingStateChanged.next(false);
+        this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackbar(error.message, 'Close', 3000);
 
         /**
@@ -69,12 +71,8 @@ export class AuthService {
   }
 
   login(authData: AuthData) {
-    // this.user = {
-    //   email: authData.email,
-    //   userId: Math.round(Math.random() * 1000).toString(),
-    // };
-
-    this.uiService.loadingStateChanged.next(true);
+    // this.uiService.loadingStateChanged.next(true);
+    this.store.dispatch(new UI.StartLoading());
 
     /**
      * Angular Firestore stores a token and sends it with every request.
@@ -84,10 +82,12 @@ export class AuthService {
       .signInWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
         // this.authSuccessfully();
-        this.uiService.loadingStateChanged.next(false);
+        // this.uiService.loadingStateChanged.next(false);
+        this.store.dispatch(new UI.StopLoading());
       })
       .catch((error) => {
-        this.uiService.loadingStateChanged.next(false);
+        // this.uiService.loadingStateChanged.next(false);
+        this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackbar(error.message, 'Close', 3000);
 
         /**
@@ -102,34 +102,16 @@ export class AuthService {
   }
 
   logout() {
-    // this.user = null;
-
     /**
      * We should .unsubscribe on logout because otherwise we have an
      * ongoing subscription and get an error:
      */
     this.afAuth.signOut();
-    // this.trainingService.cancelSubscriptions();
-    // this.authChange.next(false);
-    // this.router.navigate(['/login']);
-    // this.isAuthenticated = false;
   }
 
-  /**
-   * !!! Here we use the spread operator to return a copy of the user !!!
-   */
-  // getUser() {
-  //   return { ...this.user };
-  // }
 
   isAuth() {
     // return this.user != null;
     return this.isAuthenticated;
   }
-
-  // authSuccessfully() {
-  //   this.isAuthenticated = true;
-  //   this.authChange.next(true);
-  //   this.router.navigate(['/training']);
-  // }
 }
