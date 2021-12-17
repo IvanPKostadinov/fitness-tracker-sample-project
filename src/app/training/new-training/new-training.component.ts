@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction } from '@angular/fire/compat/firestore';
 import { Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
 
 import { Exercise } from '../exercise.model';
 import { TrainingService } from '../training.service';
 import { UIService } from 'src/app/shared/ui.service';
+import * as fromRoot from '../../app.reducer';
 
 @Component({
   selector: 'app-new-training',
@@ -19,30 +19,29 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   // We put <any> here because Exercise has an id property:
   exercises: Exercise[];
   private subscriptions: Subscription[] = [];
-  isLoading = true;
+  // isLoading = true;
+  isLoading$: Observable<boolean>;
 
   constructor(
     private trainingService: TrainingService,
     private uiService: UIService,
-    // private db: AngularFirestore
+    private store: Store<fromRoot.State>,
   ) {}
 
   ngOnInit(): void {
-    // It's good practice to initialize some services in the ngOnInit():
-    // this.exercises = this.trainingService.getAvailableExercises();
-
-
     const exerciseSub = this.trainingService.exercisesChanged.subscribe(exercises => {
       /** Here we get null if an error is thrown in the service */
       this.exercises = exercises;
     });
-    const loadingSub = this.uiService.loadingStateChanged.subscribe(isLoading => {
-      this.isLoading = isLoading;
-    });
+
+    this.isLoading$ = this.store.select(fromRoot.getIsLoading);
+    // const loadingSub = this.uiService.loadingStateChanged.subscribe(isLoading => {
+    //   this.isLoading = isLoading;
+    // });
 
     this.fetchExercises();
 
-    this.subscriptions.push(exerciseSub, loadingSub);
+    this.subscriptions.push(exerciseSub);
   }
 
   ngOnDestroy() {
@@ -58,7 +57,6 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   }
 
   onStartTraining(form: NgForm) {
-    // this.trainingStart.emit();
     this.trainingService.startExercise(form.value.exercise);
   }
 }
