@@ -24,7 +24,7 @@ export class StartTraining implements Action {
   readonly type = START_TRAINING;
 
   /** These actions have a payload, passed in the store, that we have to add: */
-  constructor(public payload: Exercise) {}
+  constructor(public payload: string) {}
 }
 
 export class StopTraining implements Action {

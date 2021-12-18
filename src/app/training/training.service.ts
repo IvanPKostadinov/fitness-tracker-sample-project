@@ -11,7 +11,9 @@ import { Store } from '@ngrx/store';
 import { Exercise } from './exercise.model';
 import { UIService } from '../shared/ui.service';
 import * as UI from '../shared/ui.actions';
-import * as fromRoot from '../app.reducer';
+import * as Training from './training.actions';
+// import * as fromRoot from '../app.reducer';
+import * as fromTraining from './training.reducer';
 
 // to be able to inject something in a Service, we need to add @Injectable()
 @Injectable({ providedIn: 'root' })
@@ -24,7 +26,11 @@ export class TrainingService {
   // private finishedExercises: Exercise[] = [];
   private subscriptions: Subscription[] = [];
 
-  constructor(private db: AngularFirestore, private uiService: UIService, private store: Store<fromRoot.State>) {}
+  constructor(
+    private db: AngularFirestore,
+    private uiService: UIService,
+    private store: Store<fromTraining.State>
+  ) {}
 
   fetchAvailableExercises() {
     // this.uiService.loadingStateChanged.next(true);
@@ -49,32 +55,44 @@ export class TrainingService {
             });
           })
         )
-        .subscribe((exercises: Exercise[]) => {
-          // this.uiService.loadingStateChanged.next(false);
-          this.store.dispatch(new UI.StopLoading());
-          this.availableExercises = exercises;
-          this.exercisesChanged.next([...this.availableExercises]);
-        }, error => {
-          // this.uiService.loadingStateChanged.next(false);
-          this.store.dispatch(new UI.StopLoading());
-          this.uiService.showSnackbar('Fetching Exercises failed, please try again!', 'Close', 3000);
-          /**
-           * With passing null, we can show a button in new-training.component to try and fetch the exercises again.
-           */
-          this.exerciseChanged.next(null);
-        })
+        .subscribe(
+          (exercises: Exercise[]) => {
+            // this.uiService.loadingStateChanged.next(false);
+            this.store.dispatch(new UI.StopLoading());
+            // this.availableExercises = exercises;
+            // this.exercisesChanged.next([...this.availableExercises]);
+
+            /** Here we pass a payload -> exercises */
+            this.store.dispatch(new Training.SetAvailableTrainings(exercises));
+          },
+          (error) => {
+            // this.uiService.loadingStateChanged.next(false);
+            this.store.dispatch(new UI.StopLoading());
+            this.uiService.showSnackbar(
+              'Fetching Exercises failed, please try again!',
+              'Close',
+              3000
+            );
+            /**
+             * With passing null, we can show a button in new-training.component to try and fetch the exercises again.
+             */
+            this.exerciseChanged.next(null);
+          }
+        )
     );
   }
 
   startExercise(selectedId: string) {
-    // // Here we are selecting a single document and updating it with .update():
-    // this.db.doc('availableExercises/' + selectedId).update({lastSelected: new Date()});
-    this.runningExercise = this.availableExercises.find(
-      (ex) => ex.id === selectedId
-    );
-    // We pass (with next()) the selected exercise through a Subject and subscribe to it, where we need it:
-    // here we pass a copy of the runningExercise:
-    this.exerciseChanged.next({ ...this.runningExercise });
+    // // // Here we are selecting a single document and updating it with .update():
+    // // this.db.doc('availableExercises/' + selectedId).update({lastSelected: new Date()});
+    // this.runningExercise = this.availableExercises.find(
+    //   (ex) => ex.id === selectedId
+    // );
+    // // We pass (with next()) the selected exercise through a Subject and subscribe to it, where we need it:
+    // // here we pass a copy of the runningExercise:
+    // this.exerciseChanged.next({ ...this.runningExercise });
+
+    this.store.dispatch(new Training.StartTraining(selectedId));
   }
 
   completeExercise() {
@@ -83,8 +101,9 @@ export class TrainingService {
       date: new Date(),
       state: 'completed',
     });
-    this.runningExercise = null;
-    this.exerciseChanged.next(null);
+    // this.runningExercise = null;
+    // this.exerciseChanged.next(null);
+    this.store.dispatch(new Training.StopTraining());
   }
 
   cancelExercise(progress: number) {
@@ -95,8 +114,9 @@ export class TrainingService {
       date: new Date(),
       state: 'cancelled',
     });
-    this.runningExercise = null;
-    this.exerciseChanged.next(null);
+    // this.runningExercise = null;
+    // this.exerciseChanged.next(null);
+    this.store.dispatch(new Training.StopTraining());
   }
 
   getRunningExercise() {
@@ -110,13 +130,15 @@ export class TrainingService {
         .collection('finishedExercises')
         .valueChanges()
         .subscribe((exercises: Exercise[]) => {
-          this.finishedExercisesChanged.next(exercises);
+          // this.finishedExercisesChanged.next(exercises);
+          this.store.dispatch(new Training.SetFinishedTrainings(exercises));
+
         })
     );
   }
 
   cancelSubscriptions() {
-    if(this.subscriptions.length > 0) {
+    if (this.subscriptions.length > 0) {
       this.subscriptions.forEach((sub) => sub.unsubscribe());
     }
   }
