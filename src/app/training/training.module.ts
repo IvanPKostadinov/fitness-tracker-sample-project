@@ -8,6 +8,8 @@ import { NewTrainingComponent } from './new-training/new-training.component';
 import { PastTrainingsComponent } from './past-trainings/past-trainings.component';
 import { TrainingRoutingModule } from './training-routing.module';
 import { TrainingComponent } from './training.component';
+import { StoreModule } from '@ngrx/store';
+import { trainingReducer } from './training.reducer';
 
 @NgModule({
   declarations: [
@@ -21,6 +23,8 @@ import { TrainingComponent } from './training.component';
     SharedModule,
     AngularFirestoreModule,
     TrainingRoutingModule,
+    /** We add this because of Lazy Loading: */
+    StoreModule.forFeature('training', trainingReducer),
     // CommonModule,
     // FormsModule,
     // MaterialModule,
