@@ -3,7 +3,6 @@ import {
   AngularFirestore,
   DocumentChangeAction,
 } from '@angular/fire/compat/firestore';
-import { Subject } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -18,11 +17,11 @@ import * as fromTraining from './training.reducer';
 // to be able to inject something in a Service, we need to add @Injectable()
 @Injectable({ providedIn: 'root' })
 export class TrainingService {
-  exerciseChanged = new Subject<Exercise>();
-  exercisesChanged = new Subject<Exercise[]>();
-  finishedExercisesChanged = new Subject<Exercise[]>();
-  private availableExercises: Exercise[] = [];
-  private runningExercise: Exercise;
+  // exerciseChanged = new Subject<Exercise>();
+  // exercisesChanged = new Subject<Exercise[]>();
+  // finishedExercisesChanged = new Subject<Exercise[]>();
+  // private availableExercises: Exercise[] = [];
+  // private runningExercise: Exercise;
   // private finishedExercises: Exercise[] = [];
   private subscriptions: Subscription[] = [];
 
@@ -76,7 +75,7 @@ export class TrainingService {
             /**
              * With passing null, we can show a button in new-training.component to try and fetch the exercises again.
              */
-            this.exerciseChanged.next(null);
+            // this.exerciseChanged.next(null);
           }
         )
     );
@@ -96,6 +95,7 @@ export class TrainingService {
   }
 
   completeExercise() {
+    /** We don't want to have an ongoing subscription => take(1) */
     this.store.select(fromTraining.getActiveTraining).pipe(take(1)).subscribe(ex => {
       this.addDataToDatabase({
         // ...this.runningExercise,
@@ -110,6 +110,7 @@ export class TrainingService {
   }
 
   cancelExercise(progress: number) {
+    /** We don't want to have an ongoing subscription => take(1) */
     this.store.select(fromTraining.getActiveTraining).pipe(take(1)).subscribe(ex => {
       this.addDataToDatabase({
         // ...this.runningExercise,

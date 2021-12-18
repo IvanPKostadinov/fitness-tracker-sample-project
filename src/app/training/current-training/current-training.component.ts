@@ -5,6 +5,7 @@ import { Store } from '@ngrx/store';
 import { TrainingService } from '../training.service';
 import { StopTrainingComponent } from './stop-training.component';
 import * as fromTraining from '../training.reducer';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-current-training',
@@ -27,7 +28,7 @@ export class CurrentTrainingComponent implements OnInit {
   }
 
   startOrResumeTimer() {
-    this.store.select(fromTraining.getActiveTraining).subscribe(ex => {
+    this.store.select(fromTraining.getActiveTraining).pipe(take(1)).subscribe(ex => {
       // const step = this.trainingService.getRunningExercise().duration / 100 * 1000;
       const step = ex.duration / 100 * 1000;
       this.timer = setInterval(() => {

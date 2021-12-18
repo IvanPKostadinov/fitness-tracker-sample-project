@@ -3,7 +3,6 @@ import {
   CanActivate,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
-  Router,
   CanLoad,
   Route,
 } from '@angular/router';
@@ -17,7 +16,7 @@ import * as fromRoot from '../app.reducer';
 export class AuthGuard implements CanActivate, CanLoad {
   constructor(
     // private authService: AuthService,
-    private router: Router,
+    // private router: Router,
     private store: Store<fromRoot.State>
   ) {}
 
@@ -42,7 +41,7 @@ export class AuthGuard implements CanActivate, CanLoad {
     //   // This line is absent from the course project:
     //   return true;
     // }
-    
+
     /** take(1) takes one value and closes this subscription */
     return this.store.select(fromRoot.getIsAuth).pipe(take(1));
   }
