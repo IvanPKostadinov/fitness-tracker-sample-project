@@ -4,7 +4,7 @@ import {
   DocumentChangeAction,
 } from '@angular/fire/compat/firestore';
 import { Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
@@ -96,32 +96,38 @@ export class TrainingService {
   }
 
   completeExercise() {
-    this.addDataToDatabase({
-      ...this.runningExercise,
-      date: new Date(),
-      state: 'completed',
+    this.store.select(fromTraining.getActiveTraining).pipe(take(1)).subscribe(ex => {
+      this.addDataToDatabase({
+        // ...this.runningExercise,
+        ...ex,
+        date: new Date(),
+        state: 'completed',
+      });
+      // this.runningExercise = null;
+      // this.exerciseChanged.next(null);
+      this.store.dispatch(new Training.StopTraining());
     });
-    // this.runningExercise = null;
-    // this.exerciseChanged.next(null);
-    this.store.dispatch(new Training.StopTraining());
   }
 
   cancelExercise(progress: number) {
-    this.addDataToDatabase({
-      ...this.runningExercise,
-      duration: this.runningExercise.duration * (progress / 100),
-      calories: this.runningExercise.calories * (progress / 100),
-      date: new Date(),
-      state: 'cancelled',
+    this.store.select(fromTraining.getActiveTraining).pipe(take(1)).subscribe(ex => {
+      this.addDataToDatabase({
+        // ...this.runningExercise,
+        ...ex,
+        duration: ex.duration * (progress / 100),
+        calories: ex.calories * (progress / 100),
+        date: new Date(),
+        state: 'cancelled',
+      });
+      // this.runningExercise = null;
+      // this.exerciseChanged.next(null);
+      this.store.dispatch(new Training.StopTraining());
     });
-    // this.runningExercise = null;
-    // this.exerciseChanged.next(null);
-    this.store.dispatch(new Training.StopTraining());
   }
 
-  getRunningExercise() {
-    return { ...this.runningExercise };
-  }
+  // getRunningExercise() {
+  //   return { ...this.runningExercise };
+  // }
 
   fetchCompletedOrCancelledExercises() {
     // valueChanges gives us an array of elements WITHOUT id:
