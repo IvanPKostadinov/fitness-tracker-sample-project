@@ -11,12 +11,14 @@ import { UIService } from '../shared/ui.service';
 import * as fromRoot from '../app.reducer';
 /** This is the convention - UI -> just the name for Actions */
 import * as UI from '../shared/ui.actions';
+import * as Auth from '../auth/auth.actions';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  authChange = new Subject<boolean>();
   // private user: User | null;
-  private isAuthenticated = false;
+
+  // authChange = new Subject<boolean>();
+  // private isAuthenticated = false;
 
   constructor(
     private router: Router,
@@ -31,14 +33,16 @@ export class AuthService {
     this.afAuth.authState.subscribe((user) => {
       // user will be null if we are not authenticated:
       if (user) {
-        this.isAuthenticated = true;
-        this.authChange.next(true);
+        // this.isAuthenticated = true;
+        // this.authChange.next(true);
+        this.store.dispatch(new Auth.SetAuthenticated());
         this.router.navigate(['/training']);
       } else {
         this.trainingService.cancelSubscriptions();
-        this.authChange.next(false);
+        // this.authChange.next(false);
+        this.store.dispatch(new Auth.SetUnauthenticated());
         this.router.navigate(['/login']);
-        this.isAuthenticated = false;
+        // this.isAuthenticated = false;
       }
     });
   }
@@ -110,8 +114,8 @@ export class AuthService {
   }
 
 
-  isAuth() {
-    // return this.user != null;
-    return this.isAuthenticated;
-  }
+  // isAuth() {
+  //   // return this.user != null;
+  //   return this.isAuthenticated;
+  // }
 }
